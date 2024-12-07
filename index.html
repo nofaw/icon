@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Awesome Icons Gallery</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        /* Phần còn lại của CSS giữ nguyên như cũ */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .search-box {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        .icons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 16px;
+        }
+
+        .icon-item {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .icon-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .icon-item i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .icon-name {
+            font-size: 12px;
+            color: #666;
+            word-break: break-all;
+        }
+
+        .copied-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            display: none;
+            animation: slideIn 0.3s ease;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .category-select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        .stats {
+            margin-bottom: 20px;
+            color: #666;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm icon...">
+            <select id="categorySelect" class="category-select">
+                <option value="all">Tất cả các loại</option>
+                <option value="fas">Solid</option>
+                <option value="far">Regular</option>
+                <option value="fab">Brands</option>
+            </select>
+            <div class="stats">
+                <span id="iconCount">0</span> biểu tượng được tìm thấy
+            </div>
+        </div>
+        <div class="icons-grid" id="iconsGrid"></div>
+        <div class="copied-toast" id="copiedToast">Đã sao chép!</div>
+    </div>
+
+    <script>
+        const iconClasses = [
+            'fas fa-address-book', 'far fa-address-book', 'fas fa-address-card',
+            'far fa-address-card', 'fas fa-adjust', 'fas fa-align-center',
+            'fas fa-align-justify', 'fas fa-align-left', 'fas fa-align-right',
+            'fab fa-amazon', 'fab fa-android', 'fab fa-apple',
+            'fas fa-archive', 'fas fa-arrow-down', 'fas fa-arrow-left',
+            'fas fa-arrow-right', 'fas fa-arrow-up', 'fas fa-arrows-alt',
+            'fas fa-backward', 'fas fa-ban', 'fas fa-battery-empty',
+            'fas fa-battery-full', 'fas fa-battery-half', 'fas fa-battery-quarter',
+            'fas fa-battery-three-quarters', 'fab fa-bitcoin', 'fas fa-bold',
+            'fas fa-book', 'fas fa-bookmark', 'far fa-bookmark',
+            'fas fa-briefcase', 'fas fa-calendar', 'far fa-calendar',
+            'fas fa-camera', 'fas fa-chart-bar', 'far fa-chart-bar',
+            'fas fa-check', 'fas fa-check-circle', 'far fa-check-circle',
+            'fas fa-chevron-down', 'fas fa-chevron-left', 'fas fa-chevron-right',
+            'fas fa-chevron-up', 'fas fa-clock', 'far fa-clock',
+            'fas fa-cloud', 'fas fa-code', 'fas fa-cog',
+            'fas fa-comment', 'far fa-comment', 'fas fa-comments',
+            'far fa-comments', 'fas fa-copy', 'far fa-copy',
+            'fab fa-css3', 'fas fa-desktop', 'fab fa-discord',
+            'fab fa-docker', 'fas fa-download', 'fas fa-edit',
+            'far fa-edit', 'fas fa-envelope', 'far fa-envelope',
+            'fas fa-exclamation-circle', 'fas fa-exclamation-triangle', 'fas fa-eye',
+            'far fa-eye', 'fab fa-facebook', 'fab fa-facebook-square',
+            'fas fa-file', 'far fa-file', 'fas fa-file-pdf',
+            'far fa-file-pdf', 'fas fa-filter', 'fas fa-folder',
+            'far fa-folder', 'fas fa-folder-open', 'far fa-folder-open',
+            'fab fa-github', 'fab fa-gitlab', 'fab fa-google',
+            'fas fa-heart', 'far fa-heart', 'fas fa-history',
+            'fas fa-home', 'fab fa-html5', 'fas fa-image',
+            'far fa-image', 'fas fa-info-circle', 'fab fa-instagram',
+            'fab fa-java', 'fab fa-js', 'fab fa-linkedin',
+            'fas fa-list', 'fas fa-lock', 'fas fa-map-marker',
+            'fas fa-minus', 'fas fa-minus-circle', 'fab fa-node-js',
+            'fas fa-pause', 'fas fa-pencil-alt', 'fas fa-phone',
+            'fab fa-php', 'fab fa-pinterest', 'fas fa-play',
+            'fas fa-plus', 'fas fa-plus-circle', 'fab fa-python',
+            'fab fa-react', 'fas fa-redo', 'fas fa-search',
+            'fas fa-share', 'fas fa-shield-alt', 'fas fa-shopping-cart',
+            'fas fa-sign-in-alt', 'fas fa-sign-out-alt', 'fas fa-star',
+            'far fa-star', 'fas fa-stop', 'fas fa-sync',
+            'fas fa-table', 'fas fa-tag', 'far fa-tag',
+            'fas fa-tags', 'far fa-tags', 'fas fa-terminal',
+            'fas fa-times', 'fas fa-times-circle', 'far fa-times-circle',
+            'fas fa-trash', 'far fa-trash', 'fab fa-twitter',
+            'fas fa-undo', 'fas fa-unlock', 'fas fa-upload',
+            'fas fa-user', 'far fa-user', 'fas fa-user-circle',
+            'far fa-user-circle', 'fas fa-users', 'fas fa-video',
+            'fab fa-vuejs', 'fab fa-windows', 'fab fa-wordpress',
+            'fab fa-youtube'
+        ];
+
+        const iconsGrid = document.getElementById('iconsGrid');
+        const searchInput = document.getElementById('searchInput');
+        const categorySelect = document.getElementById('categorySelect');
+        const iconCount = document.getElementById('iconCount');
+        const copiedToast = document.getElementById('copiedToast');
+
+        function showToast() {
+            copiedToast.style.display = 'block';
+            setTimeout(() => {
+                copiedToast.style.display = 'none';
+            }, 2000);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast();
+            });
+        }
+
+        function createIconElement(iconClass) {
+            const div = document.createElement('div');
+            div.className = 'icon-item';
+            div.innerHTML = `
+                <i class="${iconClass}"></i>
+                <div class="icon-name">${iconClass}</div>
+            `;
+            div.onclick = () => copyToClipboard(iconClass);
+            return div;
+        }
+
+        function filterIcons() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const category = categorySelect.value;
+            const filteredIcons = iconClasses.filter(iconClass => {
+                const matchesSearch = iconClass.toLowerCase().includes(searchTerm);
+                const matchesCategory = category === 'all' || iconClass.startsWith(category);
+                return matchesSearch && matchesCategory;
+            });
+
+            iconsGrid.innerHTML = '';
+            filteredIcons.forEach(iconClass => {
+                iconsGrid.appendChild(createIconElement(iconClass));
+            });
+
+            iconCount.textContent = filteredIcons.length;
+        }
+
+        searchInput.addEventListener('input', filterIcons);
+        categorySelect.addEventListener('change', filterIcons);
+
+        // Initial load
+        filterIcons();
+    </script>
+</body>
+</html>
